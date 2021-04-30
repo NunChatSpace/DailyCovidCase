@@ -1,7 +1,7 @@
-package RoutesDomain
+package Domain
 
 import "github.com/gofiber/fiber"
 
 type DailyCasesInterface interface {
-	GetData(c *fiber.Ctx) (err error)
+	GetData(c *fiber.Ctx)
 }

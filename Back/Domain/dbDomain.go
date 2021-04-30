@@ -1,4 +1,4 @@
-package RoutesDomain
+package Domain
 
 type DatabaseEngineTemplate interface {
 }
