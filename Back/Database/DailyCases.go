@@ -1,5 +1,0 @@
-package Database
-
-func CreateDB() {
-	
-}

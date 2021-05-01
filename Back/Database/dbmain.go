@@ -19,7 +19,3 @@ func SetupDatabase() {
 
 	db = dbTemp
 }
-
-func MigrateDB(autoMigrateDatabase interface{}) {
-	db.AutoMigrate(&autoMigrateDatabase)
-}

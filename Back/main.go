@@ -10,7 +10,9 @@ import (
 
 func main() {
 	app := fiber.New()
+	Database.SetupDatabase()
 	db := Database.GetDB()
+
 	ci := uc.NewCasesInfo(db)
 	csum := uc.NewCasesSum(db)
 	cs := uc.NewCovidStat(db)

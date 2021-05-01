@@ -1,19 +1,16 @@
 package Model
 
-import "gorm.io/gorm"
-
 type DailyCases struct {
-	*gorm.Model
-	Confirmed       uint   `json:"Confirmed"`
-	Recovered       uint   `json:"Recovered"`
-	Hospitalized    uint   `json:"Hospitalized"`
-	Deaths          uint   `json:"Deaths"`
-	NewConfirmed    uint   `json:"NewConfirmed"`
-	NewRecovered    uint   `json:"NewRecovered"`
-	NewHospitalized uint   `json:"NewHospitalized"`
-	NewDeaths       uint   `json:"NewDeaths"`
-	UpdateDate      string `json:"UpdateDate"`
-	Source          string `json:"Source"`
-	DevBy           string `json:"DevBy"`
-	SeverBy         string `json:"SeverBy"`
+	Confirmed       uint   `json:"Confirmed" gorm:"Confirmed"`
+	Recovered       uint   `json:"Recovered" gorm:"Recovered"`
+	Hospitalized    uint   `json:"Hospitalized" gorm:"Hospitalized"`
+	Deaths          uint   `json:"Deaths" gorm:"Deaths"`
+	NewConfirmed    uint   `json:"NewConfirmed" gorm:"NewConfirmed"`
+	NewRecovered    uint   `json:"NewRecovered" gorm:"NewRecovered"`
+	NewHospitalized uint   `json:"NewHospitalized" gorm:"NewHospitalized"`
+	NewDeaths       uint   `json:"NewDeaths" gorm:"NewDeaths"`
+	UpdateDate      string `json:"UpdateDate" gorm:"UpdateDate"`
+	Source          string `json:"Source" gorm:"Source"`
+	DevBy           string `json:"DevBy" gorm:"DevBy"`
+	SeverBy         string `json:"SeverBy" gorm:"SeverBy"`
 }

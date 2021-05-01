@@ -17,7 +17,7 @@ var handler RequestHandler
 
 func SetupRoutes(app *fiber.App, dc intf.DailyCasesInterface, cs intf.ConvidCasesStatisticInterface, csum intf.CasesSumInterface, ci intf.CasesInfoInterface) {
 
-	handler := &RequestHandler{
+	handler = RequestHandler{
 		DC:   dc,
 		CS:   cs,
 		CSum: csum,
