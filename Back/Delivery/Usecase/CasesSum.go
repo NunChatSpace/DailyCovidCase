@@ -2,11 +2,13 @@ package Usecase
 
 import (
 	"encoding/json"
+	"mainmodule/Database"
 	"mainmodule/Delivery"
 	"mainmodule/Domain"
 	"mainmodule/Model"
 
 	"github.com/gofiber/fiber"
+	"go.mongodb.org/mongo-driver/bson"
 	"gorm.io/gorm"
 )
 
@@ -18,7 +20,7 @@ func (c *casesSum) GetData(ctx *fiber.Ctx) {
 	ctx.SendString("CovidStatistics: " + "GetData")
 }
 
-func NewCasesSum(db *gorm.DB) Domain.CasesSumInterface {
+func NewCasesSum() Domain.CasesInfoInterface {
 	apiToData := "https://covid19.th-stat.com/api/open/cases/sum"
 	receivedData := &Model.CasesSum{}
 	body := Delivery.LoadData(apiToData)
@@ -28,13 +30,14 @@ func NewCasesSum(db *gorm.DB) Domain.CasesSumInterface {
 		panic(jsonErr)
 	}
 
-	db.AutoMigrate(&Model.CasesSum{})
-	tmpData := []Model.CasesSum{}
-	db.Find(&tmpData)
-	db.Where("1=1").Delete(&tmpData)
+	dbStruct := Database.GetMongoDBStruct()
+	dbStruct.CasesSumCollection.DeleteMany(dbStruct.MongoDBContext, bson.D{{}})
+	_, err := dbStruct.CasesSumCollection.InsertOne(dbStruct.MongoDBContext, receivedData)
+	if err != nil {
+		panic(err)
+	}
 
-	db.Create(receivedData)
-	return &casesSum{
-		DB: db,
+	return &cases{
+		DB: dbStruct,
 	}
 }

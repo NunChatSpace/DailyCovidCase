@@ -1,6 +1,7 @@
 package Delivery
 
 import (
+	"fmt"
 	intf "mainmodule/Domain"
 
 	"github.com/gofiber/fiber"
@@ -38,4 +39,6 @@ func SetupRoutes(app *fiber.App, dc intf.DailyCasesInterface, cs intf.ConvidCase
 	v1.Get("/CasesStatistics", handler.CS.GetData)
 	v1.Get("/CasesSum", handler.CSum.GetData)
 	v1.Get("/CasesInfo", handler.CI.GetData)
+
+	fmt.Println("Routes have been seted up.")
 }

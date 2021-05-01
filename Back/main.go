@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"mainmodule/Database"
+	"mainmodule/Delivery"
 	"mainmodule/Delivery/Usecase"
 	"time"
 
@@ -22,24 +23,23 @@ func main() {
 	// cs := uc.NewCovidStat(db)
 	// dc := uc.NewDailyCases(db)
 
-	// delivery.SetupRoutes(app, dc, cs, csum, ci)
-
 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017/"))
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	err = client.Connect(ctx)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	defer client.Disconnect(ctx)
 	Database.SetupMongoDB(client, ctx)
-	Usecase.NewCasesInfo()
-	// csum := uc.NewCasesSum(db)
-	// cs := uc.NewCovidStat(db)
-	// dc := uc.NewDailyCases(db)
+	ci := Usecase.NewCasesInfo()
+	csum := Usecase.NewCasesSum()
+	cs := Usecase.NewCovidStat()
+	dc := Usecase.NewDailyCases()
+	Delivery.SetupRoutes(app, dc, cs, csum, ci)
 
-	app.Listen(":8082")
+	log.Fatal(app.Listen(":9090"))
 }
