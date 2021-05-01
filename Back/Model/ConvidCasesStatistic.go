@@ -1,24 +1,21 @@
 package Model
 
-import "gorm.io/gorm"
-
 type ConvidCasesStatistic struct {
-	gorm.Model
-	UpdateDate string            `json:"UpdateDate"`
-	Source     string            `json:"Source"`
-	DevBy      string            `json:"DevBy"`
-	SeverBy    string            `json:"SeverBy"`
-	Data       statisticsEachDay `json:"Data"`
+	UpdateDate string              `json:"UpdateDate" gorm:"UpdateDate"`
+	Source     string              `json:"Source" gorm:"Source"`
+	DevBy      string              `json:"DevBy" gorm:"DevBy"`
+	SeverBy    string              `json:"SeverBy" gorm:"SeverBy"`
+	Data       []StatisticsEachDay `json:"Data" gorm:"Data"`
 }
 
-type statisticsEachDay struct {
-	Date            string `json:"Date"`
-	NewConfirmed    string `json:"NewConfirmed"`
-	NewRecovered    string `json:"NewRecovered"`
-	NewHospitalized string `json:"NewHospitalized"`
-	NewDeaths       string `json:"NewDeaths"`
-	Confirmed       string `json:"Confirmed"`
-	Recovered       string `json:"Recovered"`
-	Hospitalized    string `json:"Hospitalized"`
-	Deaths          string `json:"Deaths"`
+type StatisticsEachDay struct {
+	Date            string `json:"Date" gorm:"Date"`
+	NewConfirmed    int16  `json:"NewConfirmed" gorm:"NewConfirmed"`
+	NewRecovered    int16  `json:"NewRecovered" gorm:"NewRecovered"`
+	NewHospitalized int16  `json:"NewHospitalized" gorm:"NewHospitalized"`
+	NewDeaths       int16  `json:"NewDeaths" gorm:"NewDeaths"`
+	Confirmed       int16  `json:"Confirmed" gorm:"Confirmed"`
+	Recovered       int16  `json:"Recovered" gorm:"Recovered"`
+	Hospitalized    int16  `json:"Hospitalized" gorm:"Hospitalized"`
+	Deaths          int16  `json:"Deaths" gorm:"Deaths"`
 }

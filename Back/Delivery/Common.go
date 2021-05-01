@@ -1,7 +1,6 @@
 package Delivery
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -13,7 +12,6 @@ func LoadData(url string) []byte {
 	}
 
 	defer response.Body.Close()
-	fmt.Printf("%v \n", response.Body)
 	body, _ := ioutil.ReadAll(response.Body)
 
 	return body

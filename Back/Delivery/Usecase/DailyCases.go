@@ -29,6 +29,9 @@ func NewDailyCases(db *gorm.DB) Domain.DailyCasesInterface {
 	}
 
 	db.AutoMigrate(&Model.DailyCases{})
+	tmpData := []Model.DailyCases{}
+	db.Find(&tmpData)
+	db.Where("1=1").Delete(&tmpData)
 	db.Create(receivedData)
 
 	return &dailyCases{
