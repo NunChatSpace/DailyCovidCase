@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"mainmodule/Database"
 	"mainmodule/Delivery"
@@ -15,13 +16,6 @@ import (
 
 func main() {
 	app := fiber.New()
-	// Database.SetupDatabase()
-	// db := Database.GetDB()
-
-	// ci := uc.NewCasesInfo(db)
-	// csum := uc.NewCasesSum(db)
-	// cs := uc.NewCovidStat(db)
-	// dc := uc.NewDailyCases(db)
 
 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017/"))
 	if err != nil {
@@ -34,12 +28,14 @@ func main() {
 	}
 
 	defer client.Disconnect(ctx)
-	Database.SetupMongoDB(client, ctx)
+	Database.SetupMongoDB(client)
 	ci := Usecase.NewCasesInfo()
 	csum := Usecase.NewCasesSum()
 	cs := Usecase.NewCovidStat()
 	dc := Usecase.NewDailyCases()
 	Delivery.SetupRoutes(app, dc, cs, csum, ci)
 
+	t := time.Now()
+	fmt.Printf("Server start at: %s \n", t.String())
 	log.Fatal(app.Listen(":9090"))
 }

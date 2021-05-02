@@ -1,7 +1,6 @@
 package Database
 
 import (
-	"context"
 	"mainmodule/Model"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -13,7 +12,7 @@ func GetMongoDBStruct() Model.MongoDBStruct {
 	return mongoDB
 }
 
-func SetupMongoDB(client *mongo.Client, ctx context.Context) {
+func SetupMongoDB(client *mongo.Client) {
 	dbTemp := client.Database("mainDatabase")
 	mongoDB = Model.MongoDBStruct{
 		MongoDB:              dbTemp,
@@ -21,6 +20,6 @@ func SetupMongoDB(client *mongo.Client, ctx context.Context) {
 		CasesSumCollection:   dbTemp.Collection("CasesSum"),
 		CovidStatCollection:  dbTemp.Collection("CovidStat"),
 		DailyCasesCollection: dbTemp.Collection("DailyCases"),
-		MongoDBContext:       ctx,
+		MongoDBClient:        client,
 	}
 }
