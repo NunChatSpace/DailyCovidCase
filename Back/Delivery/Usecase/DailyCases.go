@@ -21,9 +21,10 @@ type DailyCases struct {
 
 func (c *DailyCases) GetData(ctx *fiber.Ctx) {
 	resp := Model.ResponseModel{}
-	context, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	cursor, err := c.DB.DailyCasesCollection.Find(context, bson.D{{}})
+	content := new(Model.DailyCases)
 
+	context, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	err := c.DB.DailyCasesCollection.FindOne(context, bson.D{{}}).Decode(&content)
 	if err != nil {
 		log.Fatal(err.Error())
 		resp = Model.ResponseModel{
@@ -32,29 +33,11 @@ func (c *DailyCases) GetData(ctx *fiber.Ctx) {
 		}
 		ctx.JSON(resp)
 	}
-	var dataContent []interface{}
 
-	for cursor.Next(context) {
-		var content Model.Info
-		err := cursor.Decode(&content)
-		if err != nil {
-			resp = Model.ResponseModel{
-				Status:  http.StatusInternalServerError,
-				Message: err.Error(),
-			}
-			ctx.JSON(resp)
-		}
-		dataContent = append(dataContent, content)
-	}
-
-	if err := cursor.Err(); err != nil {
-		log.Fatal(err)
-	}
 	resp = Model.ResponseModel{
-		Status:     http.StatusOK,
-		Message:    "Getting data is successfully",
-		DataLength: len(dataContent),
-		Data:       dataContent,
+		Status:  http.StatusOK,
+		Message: "Getting data is successfully",
+		Data:    content,
 	}
 	ctx.JSON(resp)
 }

@@ -29,7 +29,7 @@ func (c *CasesSum) GetData(ctx *fiber.Ctx) {
 	if jsonErr != nil {
 		fmt.Println(jsonErr)
 	}
-	fmt.Println(ctx.Body())
+	// fmt.Println(ctx.Body())
 	err := c.DB.CasesSumCollection.FindOne(context, bson.D{}).Decode(&content)
 
 	if err != nil {
@@ -54,15 +54,15 @@ func (c *CasesSum) makeFilter(bm *Model.CasesSum, km *Model.CasesSum) interface{
 	result := make(map[string]interface{})
 
 	if len(km.Province) > 0 {
-		fmt.Println(km.Province)
+		// fmt.Println(km.Province)
 		result["Province"] = c.getValue(bm.Province, km.Province)
 	}
 	if len(km.Nation) > 0 {
-		fmt.Println(km.Nation)
+		// fmt.Println(km.Nation)
 		result["Nation"] = c.getValue(bm.Nation, km.Nation)
 	}
 	if len(km.Gender) > 0 {
-		fmt.Println(km.Gender)
+		// fmt.Println(km.Gender)
 		result["Gender"] = c.getValue(bm.Gender, km.Gender)
 	}
 

@@ -2,7 +2,6 @@ package Delivery
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"mainmodule/Model"
@@ -28,7 +27,7 @@ func LoadData(url string) []byte {
 func ExtracData(col *mongo.Collection, client *mongo.Client) (resp Model.ResponseModel) {
 	context, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	cursor, err := col.Find(context, bson.D{{}})
-	fmt.Printf("%v \n", context)
+	// fmt.Printf("%v \n", context)
 	if err != nil {
 		log.Fatal(err.Error())
 		resp = Model.ResponseModel{
@@ -68,9 +67,9 @@ func ExtracData(col *mongo.Collection, client *mongo.Client) (resp Model.Respons
 
 func CloseCursor(ctx context.Context, cursor *mongo.Cursor) {
 	if cursor != nil {
-		fmt.Println("cursor is closed.")
+		// fmt.Println("cursor is closed.")
 		cursor.Close(ctx)
 	} else {
-		fmt.Println("cursor isn't closed.")
+		// fmt.Println("cursor isn't closed.")
 	}
 }
