@@ -15,11 +15,11 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-type cases struct {
+type Cases struct {
 	DB Model.MongoDBStruct
 }
 
-func (c *cases) GetData(ctx *fiber.Ctx) {
+func (c *Cases) GetData(ctx *fiber.Ctx) {
 	resp := Model.ResponseModel{}
 	body := new(Model.Info)
 	bodyParseError := ctx.BodyParser(body)
@@ -33,7 +33,7 @@ func (c *cases) GetData(ctx *fiber.Ctx) {
 	filter := c.makeFilter(body)
 	context, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	cursor, err := c.DB.CasesInfoCollection.Find(context, filter)
-	// fmt.Printf("%v \n", context)
+
 	if err != nil {
 		resp = Model.ResponseModel{
 			Status:  http.StatusInternalServerError,
@@ -69,7 +69,7 @@ func (c *cases) GetData(ctx *fiber.Ctx) {
 	ctx.JSON(resp)
 }
 
-func (c *cases) makeFilter(m *Model.Info) bson.M {
+func (c *Cases) makeFilter(m *Model.Info) bson.M {
 	query := bson.M{}
 	// bson.D{{"foo", "bar"}, {"hello", "world"}, {"pi", 3.14159}}
 	if m.ConfirmDate != "" {
@@ -139,7 +139,7 @@ func NewCasesInfo() Domain.CasesInfoInterface {
 		panic(err)
 	}
 
-	return &cases{
+	return &Cases{
 		DB: dbStruct,
 	}
 }

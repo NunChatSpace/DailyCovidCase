@@ -15,11 +15,11 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-type dailyCases struct {
+type DailyCases struct {
 	DB Model.MongoDBStruct
 }
 
-func (c *dailyCases) GetData(ctx *fiber.Ctx) {
+func (c *DailyCases) GetData(ctx *fiber.Ctx) {
 	resp := Model.ResponseModel{}
 	context, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	cursor, err := c.DB.DailyCasesCollection.Find(context, bson.D{{}})
@@ -59,7 +59,7 @@ func (c *dailyCases) GetData(ctx *fiber.Ctx) {
 	ctx.JSON(resp)
 }
 
-func NewDailyCases() Domain.CasesInfoInterface {
+func NewDailyCases() Domain.DailyCasesInterface {
 	apiToData := "https://covid19.th-stat.com/api/open/today"
 	receivedData := &Model.DailyCases{}
 	body := Delivery.LoadData(apiToData)
@@ -78,7 +78,7 @@ func NewDailyCases() Domain.CasesInfoInterface {
 		panic(err)
 	}
 
-	return &cases{
+	return &DailyCases{
 		DB: dbStruct,
 	}
 }

@@ -15,7 +15,11 @@ type RequestHandler struct {
 
 var handler RequestHandler
 
-func SetupRoutes(app *fiber.App, dc intf.DailyCasesInterface, cs intf.ConvidCasesStatisticInterface, csum intf.CasesSumInterface, ci intf.CasesInfoInterface) {
+func SetupRoutes(app *fiber.App,
+	dc intf.DailyCasesInterface,
+	cs intf.ConvidCasesStatisticInterface,
+	csum intf.CasesSumInterface,
+	ci intf.CasesInfoInterface) {
 
 	handler = RequestHandler{
 		DC:   dc,

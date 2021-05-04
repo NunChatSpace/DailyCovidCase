@@ -59,7 +59,7 @@ func (c *CovidStat) GetData(ctx *fiber.Ctx) {
 	ctx.JSON(resp)
 }
 
-func NewCovidStat() Domain.CasesInfoInterface {
+func NewCovidStat() Domain.ConvidCasesStatisticInterface {
 	apiToData := "https://covid19.th-stat.com/api/open/timeline"
 	receivedData := &Model.ConvidCasesStatistic{}
 	body := Delivery.LoadData(apiToData)
@@ -81,7 +81,7 @@ func NewCovidStat() Domain.CasesInfoInterface {
 	if err != nil {
 		panic(err)
 	}
-	return &cases{
+	return &CovidStat{
 		DB: dbStruct,
 	}
 }
