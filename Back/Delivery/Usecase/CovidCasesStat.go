@@ -3,15 +3,17 @@ package Usecase
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"mainmodule/Database"
 	"mainmodule/Delivery"
 	"mainmodule/Domain"
 	"mainmodule/Model"
+
 	"net/http"
 	"time"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -19,19 +21,21 @@ type CovidStat struct {
 	DB Model.MongoDBStruct
 }
 
-func (c *CovidStat) GetData(ctx *fiber.Ctx) {
+func (c *CovidStat) GetData(ctx *fiber.Ctx) Model.ResponseModel {
 	resp := Model.ResponseModel{}
 	body := new(Model.SelectDateModel)
-	bodyParseError := ctx.BodyParser(body)
-	if bodyParseError != nil {
-		resp = Model.ResponseModel{
-			Status:  http.StatusInternalServerError,
-			Message: bodyParseError.Error(),
+	filter := bson.D{}
+	if ctx.Body() != nil {
+		bodyParseError := ctx.BodyParser(body)
+		if bodyParseError != nil {
+			resp = Model.ResponseModel{
+				Status:  http.StatusInternalServerError,
+				Message: bodyParseError.Error(),
+			}
+			return resp
 		}
-		ctx.JSON(resp)
+		filter = c.makeFilter(body.FromDate, body.ToDate)
 	}
-	filter := c.makeFilter(body.FromDate, body.ToDate)
-
 	context, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	cursor, err := c.DB.CovidStatCollection.Find(context, filter)
 
@@ -41,7 +45,7 @@ func (c *CovidStat) GetData(ctx *fiber.Ctx) {
 			Status:  http.StatusInternalServerError,
 			Message: err.Error(),
 		}
-		ctx.JSON(resp)
+		return resp
 	}
 	var dataContent []interface{}
 
@@ -54,7 +58,7 @@ func (c *CovidStat) GetData(ctx *fiber.Ctx) {
 				Status:  http.StatusInternalServerError,
 				Message: err.Error(),
 			}
-			ctx.JSON(resp)
+			return resp
 		}
 		dataContent = append(dataContent, content)
 	}
@@ -68,7 +72,7 @@ func (c *CovidStat) GetData(ctx *fiber.Ctx) {
 		DataLength: len(dataContent),
 		Data:       dataContent,
 	}
-	ctx.JSON(resp)
+	return resp
 }
 
 func (c *CovidStat) makeFilter(fromDate string, toDate string) bson.D {
@@ -79,18 +83,17 @@ func (c *CovidStat) makeFilter(fromDate string, toDate string) bson.D {
 	if fromDate != "" && toDate != "" {
 		query = bson.D{{"date", bson.D{{"$gte", fd}, {"$lte", td}}}}
 	}
-
-	// fmt.Println(query)
 	return query
 }
 
 func NewCovidStat() Domain.ConvidCasesStatisticInterface {
 	apiToData := "https://covid19.th-stat.com/api/open/timeline"
 	receivedData := &Model.ConvidCasesStatistic{}
-	body := Delivery.LoadData(apiToData)
+	body, _ := Delivery.LoadData(apiToData)
 	jsonErr := json.Unmarshal(body, receivedData)
 	if jsonErr != nil {
-		panic(jsonErr)
+		fmt.Println(jsonErr)
+		return nil
 	}
 	intf := make([]interface{}, len(receivedData.Data))
 
@@ -116,7 +119,8 @@ func NewCovidStat() Domain.ConvidCasesStatisticInterface {
 	dbStruct.CovidStatCollection.DeleteMany(context, bson.D{{}})
 	_, err := dbStruct.CovidStatCollection.InsertMany(context, intf)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return nil
 	}
 	return &CovidStat{
 		DB: dbStruct,

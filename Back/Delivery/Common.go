@@ -6,22 +6,23 @@ import (
 	"log"
 	"mainmodule/Model"
 	"net/http"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func LoadData(url string) []byte {
+func LoadData(url string) ([]byte, error) {
 	response, err := http.Get(url)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	defer response.Body.Close()
-	body, _ := ioutil.ReadAll(response.Body)
+	body, err := ioutil.ReadAll(response.Body)
 
-	return body
+	return body, err
 }
 
 func ExtracData(col *mongo.Collection, client *mongo.Client) (resp Model.ResponseModel) {
@@ -71,5 +72,17 @@ func CloseCursor(ctx context.Context, cursor *mongo.Cursor) {
 		cursor.Close(ctx)
 	} else {
 		// fmt.Println("cursor isn't closed.")
+	}
+}
+
+func WriteLog(data string) {
+
+	f, err := os.Create("log.txt")
+	if err != nil {
+		panic(err)
+	}
+	_, err2 := f.WriteString(data)
+	if err2 != nil {
+		log.Fatal(err2)
 	}
 }

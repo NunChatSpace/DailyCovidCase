@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -20,7 +20,7 @@ type CasesSum struct {
 	DB Model.MongoDBStruct
 }
 
-func (c *CasesSum) GetData(ctx *fiber.Ctx) {
+func (c *CasesSum) GetData(ctx *fiber.Ctx) Model.ResponseModel {
 	resp := Model.ResponseModel{}
 	context, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	body := new(Model.CasesSum)
@@ -38,7 +38,7 @@ func (c *CasesSum) GetData(ctx *fiber.Ctx) {
 			Status:  http.StatusInternalServerError,
 			Message: err.Error(),
 		}
-		ctx.JSON(resp)
+		return resp
 	}
 
 	dataContent := c.makeFilter(content, body)
@@ -47,7 +47,7 @@ func (c *CasesSum) GetData(ctx *fiber.Ctx) {
 		Message: "Getting data is successfully",
 		Data:    dataContent,
 	}
-	ctx.JSON(resp)
+	return resp
 }
 
 func (c *CasesSum) makeFilter(bm *Model.CasesSum, km *Model.CasesSum) interface{} {
@@ -83,11 +83,12 @@ func (c *CasesSum) getValue(bm map[string]int, km map[string]int) interface{} {
 func NewCasesSum() Domain.CasesSumInterface {
 	apiToData := "https://covid19.th-stat.com/api/open/cases/sum"
 	receivedData := &Model.CasesSum{}
-	body := Delivery.LoadData(apiToData)
+	body, _ := Delivery.LoadData(apiToData)
 
 	jsonErr := json.Unmarshal(body, receivedData)
 	if jsonErr != nil {
-		panic(jsonErr)
+		fmt.Println(jsonErr)
+		return nil
 	}
 
 	dbStruct := Database.GetMongoDBStruct()
@@ -95,7 +96,8 @@ func NewCasesSum() Domain.CasesSumInterface {
 	dbStruct.CasesSumCollection.DeleteMany(context, bson.D{{}})
 	_, err := dbStruct.CasesSumCollection.InsertOne(context, receivedData)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return nil
 	}
 
 	return &CasesSum{

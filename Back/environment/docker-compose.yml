@@ -1,13 +1,11 @@
-version: '2'
+version: '3'
 services:
   mongo:
     image: mongo:3.4
     container_name: mongo
     ports:
       - '27017:27017'
-    volumes: 
-      - '/data/configdb:/data/configdb'
-      - '/data/db:/data/db'
+
   mongo-express:
     image: mongo-express
     container_name: mongo_express

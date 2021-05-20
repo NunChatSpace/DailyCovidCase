@@ -3,6 +3,7 @@ package Usecase
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"mainmodule/Database"
 	"mainmodule/Delivery"
@@ -11,7 +12,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -19,7 +20,7 @@ type DailyCases struct {
 	DB Model.MongoDBStruct
 }
 
-func (c *DailyCases) GetData(ctx *fiber.Ctx) {
+func (c *DailyCases) GetData(ctx *fiber.Ctx) Model.ResponseModel {
 	resp := Model.ResponseModel{}
 	content := new(Model.DailyCases)
 
@@ -31,7 +32,7 @@ func (c *DailyCases) GetData(ctx *fiber.Ctx) {
 			Status:  http.StatusInternalServerError,
 			Message: err.Error(),
 		}
-		ctx.JSON(resp)
+		return resp
 	}
 
 	resp = Model.ResponseModel{
@@ -39,17 +40,18 @@ func (c *DailyCases) GetData(ctx *fiber.Ctx) {
 		Message: "Getting data is successfully",
 		Data:    content,
 	}
-	ctx.JSON(resp)
+	return resp
 }
 
 func NewDailyCases() Domain.DailyCasesInterface {
 	apiToData := "https://covid19.th-stat.com/api/open/today"
 	receivedData := &Model.DailyCases{}
-	body := Delivery.LoadData(apiToData)
+	body, _ := Delivery.LoadData(apiToData)
 
 	jsonErr := json.Unmarshal(body, receivedData)
 	if jsonErr != nil {
-		log.Fatal(jsonErr)
+		fmt.Println(jsonErr)
+		return nil
 	}
 
 	dbStruct := Database.GetMongoDBStruct()
@@ -58,7 +60,8 @@ func NewDailyCases() Domain.DailyCasesInterface {
 	dbStruct.DailyCasesCollection.DeleteMany(context, bson.D{{}})
 	_, err := dbStruct.DailyCasesCollection.InsertOne(context, receivedData)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return nil
 	}
 
 	return &DailyCases{

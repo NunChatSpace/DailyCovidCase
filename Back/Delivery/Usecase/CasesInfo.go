@@ -3,6 +3,7 @@ package Usecase
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"mainmodule/Database"
 	"mainmodule/Delivery"
@@ -11,7 +12,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -19,7 +20,7 @@ type Cases struct {
 	DB Model.MongoDBStruct
 }
 
-func (c *Cases) GetData(ctx *fiber.Ctx) {
+func (c *Cases) GetData(ctx *fiber.Ctx) Model.ResponseModel {
 	resp := Model.ResponseModel{}
 	body := new(Model.Info)
 	bodyParseError := ctx.BodyParser(body)
@@ -28,7 +29,8 @@ func (c *Cases) GetData(ctx *fiber.Ctx) {
 			Status:  http.StatusInternalServerError,
 			Message: bodyParseError.Error(),
 		}
-		ctx.JSON(resp)
+
+		return resp
 	}
 	filter := c.makeFilter(body)
 	context, _ := context.WithTimeout(context.Background(), 10*time.Second)
@@ -39,7 +41,7 @@ func (c *Cases) GetData(ctx *fiber.Ctx) {
 			Status:  http.StatusInternalServerError,
 			Message: err.Error(),
 		}
-		ctx.JSON(resp)
+		return resp
 	}
 	var dataContent []interface{}
 
@@ -51,7 +53,7 @@ func (c *Cases) GetData(ctx *fiber.Ctx) {
 				Status:  http.StatusInternalServerError,
 				Message: err.Error(),
 			}
-			ctx.JSON(resp)
+			return resp
 		}
 		dataContent = append(dataContent, content)
 	}
@@ -66,7 +68,7 @@ func (c *Cases) GetData(ctx *fiber.Ctx) {
 		Data:       dataContent,
 	}
 
-	ctx.JSON(resp)
+	return resp
 }
 
 func (c *Cases) makeFilter(m *Model.Info) bson.M {
@@ -119,10 +121,11 @@ func NewCasesInfo() Domain.CasesInfoInterface {
 
 	apiToData := "https://covid19.th-stat.com/api/open/cases"
 	receivedData := &Model.CasesInfo{}
-	body := Delivery.LoadData(apiToData)
+	body, _ := Delivery.LoadData(apiToData)
 	jsonErr := json.Unmarshal(body, receivedData)
 	if jsonErr != nil {
-		panic(jsonErr)
+		fmt.Println(jsonErr)
+		return nil
 	}
 
 	intf := make([]interface{}, len(receivedData.Data))
@@ -136,7 +139,8 @@ func NewCasesInfo() Domain.CasesInfoInterface {
 	dbStruct.CasesInfoCollection.DeleteMany(context, bson.D{{}})
 	_, err := dbStruct.CasesInfoCollection.InsertMany(context, intf)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return nil
 	}
 
 	return &Cases{
