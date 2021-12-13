@@ -72,6 +72,7 @@ func (c *Cases) GetData(ctx *fiber.Ctx) Model.ResponseModel {
 }
 
 func (c *Cases) makeFilter(m *Model.Info) bson.M {
+	fmt.Print("testestsetsetesets")
 	query := bson.M{}
 	// bson.D{{"foo", "bar"}, {"hello", "world"}, {"pi", 3.14159}}
 	if m.ConfirmDate != "" {
