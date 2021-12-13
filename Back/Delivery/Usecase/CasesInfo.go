@@ -116,7 +116,7 @@ func (c *Cases) makeFilter(m *Model.Info) bson.M {
 	if m.StatQuarantine != 0 {
 		query["statquarantine"] = m.StatQuarantine
 	}
-	// fmt.Println(query)
+	fmt.Println(query)
 	return query
 }
 
