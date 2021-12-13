@@ -68,6 +68,8 @@ func (c *Cases) GetData(ctx *fiber.Ctx) Model.ResponseModel {
 		Data:       dataContent,
 	}
 
+	fmt.Print(resp)
+
 	return resp
 }
 
